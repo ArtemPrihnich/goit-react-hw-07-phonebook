@@ -1,23 +1,34 @@
-import React from 'react'
+import { useEffect } from 'react'
 import { Button, Item, List } from './ContactsList.styled'
 import { useSelector, useDispatch } from 'react-redux'
-import { getFilteredContacts } from 'redux/contacts/contacts-selectors';
-import { removeContact } from 'redux/contacts/contacts-slice';
+import { fetchContacts } from "redux/operations";
+import { getError, getFilteredContacts, getIsLoading } from 'redux/contacts/contacts-selectors';
+import { deleteContact } from 'redux/operations';
 
 export default function ContactsList() {
     const contacts = useSelector(getFilteredContacts)
+    const loading = useSelector(getIsLoading)
+    const error = useSelector(getError)
     const dispatch = useDispatch()
 
-    const deleteContact = (id) => {
-        dispatch(removeContact(id))
+    useEffect(() => {
+        dispatch(fetchContacts())
+    }, [dispatch])
+
+    const removeContact = (id) => {
+        const action = deleteContact(id);
+        dispatch(action);
     }
+
     return (
         <List>
-            {contacts?.map(({ name, number, id }) => {
+            {loading && <li>loading...</li>}
+            {!error && contacts?.map(({ name, phone, id }) => {
                 return (
-                    <Item key={id}>{name}: {number} <Button onClick={() => deleteContact(id)}>delete</Button></Item>
+                    <Item key={id}>{name}: {phone} <Button onClick={() => removeContact(id)}>delete</Button></Item>
                 )
             })}
+            {!loading && error && <li>Error</li>}
         </List>
     )
 }
