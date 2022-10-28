@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { fetchContacts } from "redux/operations";
 import { getError, getFilteredContacts, getIsLoading } from 'redux/contacts/contacts-selectors';
 import { deleteContact } from 'redux/operations';
+import Loader from 'components/Loader/Loader';
+import ErrorNotify from 'components/ErrorNotify/ErrorNotify';
 
 export default function ContactsList() {
     const contacts = useSelector(getFilteredContacts)
@@ -22,13 +24,13 @@ export default function ContactsList() {
 
     return (
         <List>
-            {loading && <li>loading...</li>}
+            {loading && <Loader />}
             {!error && contacts?.map(({ name, phone, id }) => {
                 return (
                     <Item key={id}>{name}: {phone} <Button onClick={() => removeContact(id)}>delete</Button></Item>
                 )
             })}
-            {!loading && error && <li>Error</li>}
+            {!loading && error && <ErrorNotify />}
         </List>
     )
 }
